@@ -1,0 +1,11 @@
+{
+    "platforms": [
+        "android"
+    ],
+    "android": {
+        "package": "expo.modules.medialistener",
+        "modules": [
+            "expo.modules.medialistener.MediaListenerModule"
+        ]
+    }
+}

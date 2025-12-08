@@ -1,0 +1,12 @@
+{
+    "name": "media-listener",
+    "version": "1.0.0",
+    "description": "A local Expo module to listen to media notifications",
+    "main": "index.ts",
+    "keywords": [
+        "react-native",
+        "expo",
+        "media-listener"
+    ],
+    "author": "Antigravity"
+}

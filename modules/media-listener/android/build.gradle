@@ -1,0 +1,31 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+group = 'expo.modules.medialistener'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.medialistener"
+  compileSdkVersion project.hasProperty('compileSdkVersion') ? project.compileSdkVersion : 34
+  defaultConfig {
+    minSdkVersion project.hasProperty('minSdkVersion') ? project.minSdkVersion : 23
+    targetSdkVersion project.hasProperty('targetSdkVersion') ? project.targetSdkVersion : 34
+    versionCode 1
+    versionName "1.0"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+dependencies {
+  implementation project(':expo-modules-core')
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:${getKotlinVersion()}"
+}
+
+def getKotlinVersion() {
+  if (project.hasProperty("kotlinVersion")) {
+    return project.kotlinVersion
+  }
+  return "2.0.21"
+}
