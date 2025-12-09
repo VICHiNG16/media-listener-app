@@ -1,13 +1,21 @@
-# 🎵 Media Session App
+# 🎵 Media Listener
 
 A React Native / Expo application that uses Android's **MediaSessionManager** API to capture and control media playback from any audio source on your Android device.
 
-## What's New (vs media-listener-app)
+## Features
 
-This app is an evolution of [media-listener-app](https://github.com/VICHiNG16/media-listener-app) with significant improvements:
+- 🔔 **Real-time Media Events** – Captures metadata as soon as media playback changes
+- ▶️ **Playback State** – Tracks playing/paused/stopped/buffering states
+- ⏱️ **Position Tracking** – Shows current playback position with progress bar
+- 🎛️ **Transport Controls** – Play, pause, skip to next/previous track
+- 🎨 **Clean Dark UI** – Modern interface displaying track info
+- 📱 **Source App Detection** – Shows which app is playing the media
+- 🔧 **Raw Data View** – JSON output for debugging and development
 
-| Feature | media-listener-app | media-session-app |
-|---------|-------------------|-------------------|
+## v2.0 Updates
+
+| Feature | v1.0 | v2.0 |
+|---------|------|------|
 | **API Used** | NotificationListenerService only | MediaSessionManager + NotificationListenerService |
 | **Playback State** | ❌ Not available | ✅ Playing/Paused/Stopped/Buffering |
 | **Track Position** | ❌ Not available | ✅ Current position + duration |
@@ -15,7 +23,7 @@ This app is an evolution of [media-listener-app](https://github.com/VICHiNG16/me
 | **Progress Bar** | ❌ Not available | ✅ Visual progress with time display |
 | **Event Detection** | Notification parsing | Direct MediaController callbacks |
 
-### Key Improvements
+### Key Improvements in v2.0
 
 1. **MediaSessionManager Integration** – Uses `MediaController.Callback` for real-time playback state and metadata changes
 2. **Transport Controls** – Play, pause, skip to next/previous track
@@ -35,7 +43,7 @@ This app is an evolution of [media-listener-app](https://github.com/VICHiNG16/me
 ## Architecture
 
 ```
-media-session-app/
+media-listener-app/
 ├── App.tsx                           # Main React Native UI with controls
 ├── modules/
 │   └── media-session/
@@ -53,8 +61,8 @@ media-session-app/
 
 ```bash
 # Clone the repository
-git clone https://github.com/VICHiNG16/media-session-app.git
-cd media-session-app
+git clone https://github.com/VICHiNG16/media-listener-app.git
+cd media-listener-app
 
 # Install dependencies
 npm install
