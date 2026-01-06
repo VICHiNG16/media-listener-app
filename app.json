@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mediasessionapp"
     },
     "android": {
       "package": "com.mediasessionapp",
@@ -26,6 +27,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e4e305fa-af74-4a8d-b8f2-a826485e1c32"
+      }
     }
   }
 }

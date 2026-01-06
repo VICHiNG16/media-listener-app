@@ -115,6 +115,33 @@ class MediaSessionService : NotificationListenerService() {
             else -> "unknown"
         }
 
+        var artworkUri: String? = null
+        try {
+             // Try to get the art bitmap
+            val bitmap = metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+                ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART)
+
+            if (bitmap != null) {
+                // Save to cache
+                // We use the package name to avoid collisions if multiple apps are playing (though rare for active session)
+                // Use a consistent name per package to overwrite old art and save space
+                val file = java.io.File(cacheDir, "album_art_${controller.packageName}.png")
+                val stream = java.io.FileOutputStream(file)
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream)
+                stream.close()
+                artworkUri = "file://${file.absolutePath}"
+            } else {
+                 // Try string uri if bitmap is missing (less common for local players but possible)
+                 val artUriStr = metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
+                    ?: metadata?.getString(MediaMetadata.METADATA_KEY_ART_URI)
+                 if (artUriStr != null) {
+                     artworkUri = artUriStr
+                 }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error saving artwork", e)
+        }
+
         val bundle = Bundle().apply {
             putString("package", controller.packageName)
             putString("title", metadata?.getString(MediaMetadata.METADATA_KEY_TITLE) ?: "")
@@ -122,6 +149,7 @@ class MediaSessionService : NotificationListenerService() {
                 ?: metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST) ?: "")
             putString("album", metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM) ?: "")
             putString("state", stateString)
+            putString("artworkUri", artworkUri)
             putLong("position", state?.position ?: 0L)
             putLong("duration", metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L)
             putLong("timestamp", System.currentTimeMillis())
