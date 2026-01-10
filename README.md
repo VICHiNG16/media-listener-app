@@ -34,7 +34,7 @@ An Expo native module for Android that uses **MediaSessionManager** API to captu
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | **React Native** | 0.81.5 | Cross-platform mobile framework |
-| **Expo** | ~54.0.27 | Development and build toolchain |
+| **Expo** | ~54.0.30 | Development and build toolchain |
 | **Kotlin** | 2.1.20 | Native Android module implementation |
 | **TypeScript** | ~5.9.2 | Type-safe JavaScript |
 
