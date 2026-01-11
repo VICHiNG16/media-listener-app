@@ -1,5 +1,20 @@
 {
     "name": "media-session",
     "version": "1.0.0",
-    "main": "index.ts"
+    "main": "index.ts",
+    "types": "index.ts",
+    "scripts": {
+        "build": "expo-module build",
+        "clean": "expo-module clean",
+        "pack-time": "node pack.js"
+    },
+    "dependencies": {},
+    "peerDependencies": {
+        "expo": "*",
+        "react": "*",
+        "react-native": "*"
+    },
+    "devDependencies": {
+        "expo-modules-core": "~2.0.0"
+    }
 }

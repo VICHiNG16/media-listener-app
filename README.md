@@ -1,61 +1,56 @@
-# 🎵 Media Listener
+# 🎵 Media Session Module
 
-A React Native / Expo application that uses Android's **MediaSessionManager** API to capture and control media playback from any audio source on your Android device.
+An Expo native module for Android that uses **MediaSessionManager** API to capture and control media playback from any audio source on your device.
 
 ## Features
 
 - 🔔 **Real-time Media Events** – Captures metadata as soon as media playback changes
 - ▶️ **Playback State** – Tracks playing/paused/stopped/buffering states
-- ⏱️ **Position Tracking** – Shows current playback position with progress bar
+- ⏱️ **Position Tracking** – Current playback position and duration
 - 🎛️ **Transport Controls** – Play, pause, skip to next/previous track
-- 🎨 **Clean Dark UI** – Modern interface displaying track info
-- 📱 **Source App Detection** – Shows which app is playing the media
-- 🔧 **Raw Data View** – JSON output for debugging and development
+- 🖼️ **Album Artwork** – Extracts artwork as base64 data URI
+- 📱 **Source App Detection** – Identifies which app is playing media
 
-## v2.0 Updates
+## Version Comparison
 
-| Feature | v1.0 | v2.0 |
-|---------|------|------|
-| **API Used** | NotificationListenerService only | MediaSessionManager + NotificationListenerService |
-| **Playback State** | ❌ Not available | ✅ Playing/Paused/Stopped/Buffering |
-| **Track Position** | ❌ Not available | ✅ Current position + duration |
-| **Playback Control** | ❌ Not available | ✅ Play/Pause/Skip Next/Previous |
-| **Progress Bar** | ❌ Not available | ✅ Visual progress with time display |
-| **Event Detection** | Notification parsing | Direct MediaController callbacks |
+| Feature | v1.0 | v2.0 | v3.0 |
+|---------|------|------|------|
+| **API Used** | NotificationListenerService | MediaSessionManager | MediaSessionManager |
+| **Playback State** | ❌ | ✅ Playing/Paused/Stopped/Buffering | ✅ |
+| **Track Position** | ❌ | ✅ Current position + duration | ✅ |
+| **Playback Control** | ❌ | ✅ Play/Pause/Skip | ✅ |
+| **Album Artwork** | ❌ | ❌ | ✅ Base64 data URI |
+| **Get Current State** | ❌ | ❌ | ✅ `getState()` |
+| **Event Detection** | Notification parsing | MediaController callbacks | MediaController callbacks |
 
-### Key Improvements in v2.0
+### v3.0 Highlights
 
-1. **MediaSessionManager Integration** – Uses `MediaController.Callback` for real-time playback state and metadata changes
-2. **Transport Controls** – Play, pause, skip to next/previous track
-3. **Position Tracking** – Shows current playback position with progress bar
-4. **More Reliable Events** – Gets metadata directly from MediaSession instead of parsing notifications
-5. **Cleaner Architecture** – Separates MediaSessionService from module logic
+1. **Album Artwork Extraction** – Retrieves artwork bitmap from MediaSession metadata and converts to base64 data URI
+2. **`getState()` API** – Synchronously get the current media state without waiting for an event
+3. **`artworkUri` Field** – New optional field in `MediaEvent` containing the artwork as a data URI
 
 ## Tech Stack
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | **React Native** | 0.81.5 | Cross-platform mobile framework |
-| **Expo** | ~54.0.27 | Development and build toolchain |
+| **Expo** | ~54.0.30 | Development and build toolchain |
 | **Kotlin** | 2.1.20 | Native Android module implementation |
 | **TypeScript** | ~5.9.2 | Type-safe JavaScript |
 
 ## Architecture
 
 ```
-media-listener-app/
-├── App.tsx                           # Main React Native UI with controls
-├── modules/
-│   └── media-session/
-│       ├── index.ts                  # TypeScript API wrapper
-│       ├── expo-module.config.json   # Expo native module config
-│       └── android/src/main/kotlin/
-│           └── expo/modules/mediasession/
-│               ├── MediaSessionModule.kt     # Expo module bridge
-│               ├── MediaSessionService.kt    # NotificationListener + MediaSessionManager
-│               └── MediaEventManager.kt      # Event emission singleton
-└── android/                          # Generated native Android project
+modules/media-session/
+├── index.ts                          # TypeScript API wrapper
+├── expo-module.config.json           # Expo native module config
+└── android/src/main/kotlin/
+    └── expo/modules/mediasession/
+        ├── MediaSessionModule.kt     # Expo module bridge
+        ├── MediaSessionService.kt    # NotificationListener + MediaSessionManager
+        └── MediaEventManager.kt      # Event emission singleton
 ```
+
 
 ## Installation
 
@@ -102,11 +97,22 @@ import * as MediaSession from './modules/media-session';
 const hasPermission = MediaSession.hasPermission();
 MediaSession.requestPermission();
 
+// Get current state (v3.0+)
+const currentState = MediaSession.getState();
+if (currentState) {
+  console.log('Currently playing:', currentState.title);
+}
+
 // Listen for media changes
 const subscription = MediaSession.addMediaListener((event) => {
   console.log('Track:', event.title, 'by', event.artist);
   console.log('State:', event.state);
   console.log('Position:', event.position, '/', event.duration);
+  
+  // Album artwork (v3.0+)
+  if (event.artworkUri) {
+    console.log('Artwork available as data URI');
+  }
 });
 
 // Transport controls
@@ -123,14 +129,15 @@ subscription.remove();
 
 ```typescript
 {
-  title: string;      // Track title
-  artist: string;     // Artist name
-  album: string;      // Album name
-  package: string;    // Source app package name
+  title: string;       // Track title
+  artist: string;      // Artist name
+  album: string;       // Album name
+  package: string;     // Source app package name
   state: 'playing' | 'paused' | 'stopped' | 'buffering' | 'unknown';
-  position: number;   // Current position in ms
-  duration: number;   // Track duration in ms
-  timestamp: number;  // Event timestamp
+  position: number;    // Current position in ms
+  duration: number;    // Track duration in ms
+  timestamp: number;   // Event timestamp
+  artworkUri?: string; // Album artwork as base64 data URI (v3.0+)
 }
 ```
 

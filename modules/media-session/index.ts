@@ -13,6 +13,7 @@ export interface MediaEvent {
     position: number;
     duration: number;
     timestamp: number;
+    artworkUri?: string;
 }
 
 export function requestPermission(): void {

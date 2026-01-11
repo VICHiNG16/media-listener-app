@@ -64,7 +64,46 @@ class MediaSessionModule : Module() {
                 "state" to stateString,
                 "position" to (state?.position ?: 0L),
                 "duration" to (metadata?.getLong(android.media.MediaMetadata.METADATA_KEY_DURATION) ?: 0L)
-            )
+            ).apply {
+                // Determine artworkUri similar to Service logic for initial state get
+                // Note: ideally we factor this logic out, but for now we approximate or wait for event
+                // Actually, getState is often called first.
+                // However, accessing context.cacheDir here is easy.
+                // But the service saves the file. We should check if the file exists or rely on the service to emit it.
+                // For direct synchronous getState, extracting bitmap again is heavy.
+                // A better approach for getState:
+                // We don't have easy access to the Bitmap here without the controller callbacks or re-querying.
+                // Let's rely on the event or just try to check if the file exists from previous service runs?
+                // No, that's flaky.
+                // Let's just return null for artworkUri in synchronous getState for now, 
+                // OR duplicate the extraction logic if we really want it. 
+                // Given the user asked for "event.mediaGraphic", the event is the primary mechanism.
+                // But consistency is good. Let's trying to support it if easy.
+                
+                // Retrying extraction:
+                var artworkUri: String? = null
+                try {
+                     val bitmap = metadata?.getBitmap(android.media.MediaMetadata.METADATA_KEY_ALBUM_ART)
+                        ?: metadata?.getBitmap(android.media.MediaMetadata.METADATA_KEY_ART)
+                     if (bitmap != null) {
+                         val file = java.io.File(context.cacheDir, "album_art_${controller.packageName}.png")
+                         // Writing to disk on main thread/JS thread might be bad if image is huge, 
+                         // but standard metadata icons are usually small.
+                         val stream = java.io.FileOutputStream(file)
+                         bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream)
+                         stream.close()
+                         artworkUri = "file://${file.absolutePath}"
+                     } else {
+                         val artUriStr = metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
+                            ?: metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ART_URI)
+                         if (artUriStr != null) artworkUri = artUriStr
+                     }
+                } catch(e: Exception) {}
+                
+                if (artworkUri != null) {
+                    (this as MutableMap<String, Any?>)["artworkUri"] = artworkUri
+                }
+            }
         }
 
         OnStartObserving {
